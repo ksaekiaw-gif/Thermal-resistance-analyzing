@@ -160,6 +160,93 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
     plt.savefig(path3,dpi=300)
     plt.close()
 
+    # === 最終行だけ温度分布グラフ ===
+    last = len(df) - 1
+
+    y1 = df.iloc[last, 1:5].astype(float).values
+    y2 = df.iloc[last, 5:9].astype(float).values
+
+    y1_sorted = np.sort(y1)[::-1]
+    y2_sorted = np.sort(y2)[::-1]
+
+    # 回帰直線
+    a1, b1 = np.polyfit(x1, y1_sorted, 1)
+    a2, b2 = np.polyfit(x2, y2_sorted, 1)
+
+    # 外挿点
+    x_ext1 = 4.5
+    x_ext2 = 5 + d/10 - 0.5
+    y_ext1 = a1 * x_ext1 + b1
+    y_ext2 = a2 * x_ext2 + b2
+
+    # R2
+    y_pred1 = a1*x1 + b1
+    y_pred2 = a2*x2 + b2
+
+    SS1_res = np.sum((y1_sorted-y_pred1)**2)
+    SS1_tot = np.sum((y1_sorted - np.mean(y1_sorted))**2)
+    R2_1 = 1 - SS1_res/SS1_tot
+
+    SS2_res = np.sum((y2_sorted-y_pred2)**2)
+    SS2_tot = np.sum((y2_sorted - np.mean(y2_sorted))**2)
+    R2_2 = 1 - SS2_res/SS2_tot
+
+    plt.figure(figsize=(7,5))
+
+    # 実測点
+    plt.scatter(x1, y1_sorted, s=60, label="CH2–5 (sorted)")
+    plt.scatter(x2, y2_sorted, s=60, label="CH7–10 (sorted)")
+
+    # 外挿点
+    # 上側 外挿点（青枠・白塗り）
+    plt.scatter(
+        x_ext1, y_ext1,
+        s=60, marker="o",
+        facecolors="white",
+        edgecolors="tab:blue",
+        linewidths=2,
+        label="Upper surface"
+    )
+
+    # 下側 外挿点（オレンジ枠・白塗り）
+    plt.scatter(
+        x_ext2, y_ext2,
+        s=60, marker="o",
+        facecolors="white",
+        edgecolors="orange",
+        linewidths=2,
+        label="Lower surface"
+    )
+
+    # 回帰線（外挿点まで）
+    xx1 = np.linspace(min(x1), x_ext1, 100)
+    xx2 = np.linspace(x_ext2, max(x2), 100)
+    plt.plot(xx1, a1*xx1 + b1, linestyle="--", label="Fit Upper")
+    plt.plot(xx2, a2*xx2 + b2, linestyle="--", label="Fit Lower")
+
+    # 回帰式 + R2
+    plt.text(
+        0.05, 0.5,
+        f"Upper: y = {a1:.3f} x + {b1:.3f}, R² = {R2_1:.4f}\n"
+        f"Lower: y = {a2:.3f} x + {b2:.3f}, R² = {R2_2:.4f}",
+        transform=plt.gca().transAxes,
+        fontsize=12,
+        verticalalignment='top',
+        bbox=dict(facecolor='white', alpha=0.7)
+    )
+
+    plt.xlabel("Position")
+    plt.ylabel("Temperature [°C]")
+    plt.title("Temperature Distribution (Last Row)")
+    plt.legend()
+    plt.grid(True)
+    plt.xlim(graph_limits["position"]["xlim"])
+    plt.ylim(graph_limits["position"]["ylim"])
+    plt.tight_layout()
+    path4=os.path.join(output_dir,"温度分布.png")
+    plt.savefig(path3,dpi=300)
+    plt.close()
+    
     # =============================
     # CSV保存
     # =============================
@@ -167,7 +254,7 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
     result_path=os.path.join(output_dir,"result.csv")
     df_result.to_csv(result_path,index=False,encoding="shift_jis")
 
-    return path1,path2,path3,result_path,R_avg_1000,R_avg_2000,base_name
+    return path1,path2,path3,path4,result_path,R_avg_1000,R_avg_2000,base_name
 
 
 # =============================
@@ -182,26 +269,26 @@ r2=st.number_input("サンプル直径2r [cm] (サンプルが直方体の場合
 d=st.number_input("サンプル厚みd [mm]",value=1.0, step=0.001)
 
 st.subheader("グラフ設定")
-time_min=st.number_input("時間軸_開始値[s]",value=0)
-time_max=st.number_input("時間軸_最大値[s]",value=8000)
+time_min=st.number_input("Time_開始値[s]",value=0)
+time_max=st.number_input("Time_最大値[s]",value=8000)
 st.subheader("Rグラフ設定")
 
 R_xmin=time_min
 R_xmax=time_max
 
-R_ymin=st.number_input("熱抵抗_最小値[mm²K/W]",value=0.0)
-R_ymax=st.number_input("熱抵抗_最大値[mm²K/W]",value=1500)
+R_ymin=st.number_input("R_最小値[mm²K/W]",value=0.0)
+R_ymax=st.number_input("R_最大値[mm²K/W]",value=1500)
 
 st.subheader("上側銅ブロックのグラフ設定")
 temp_xmin=time_min
 temp_xmax=time_max
 
-temp1_ymin=st.number_input("上側銅ブロック温度_最小値",value=20)
-temp1_ymax=st.number_input("上側銅ブロック温度_最大値",value=110)
+temp1_ymin=st.number_input("Temp_最小値",value=20)
+temp1_ymax=st.number_input("Temp_最大値",value=110)
 
 st.subheader("下側銅ブロックのグラフ設定")
-temp2_ymin=st.number_input("下側銅ブロック温度_最小値",value=20)
-temp2_ymax=st.number_input("下側銅ブロック温度_最大値",value=30)
+temp2_ymin=st.number_input("Temp_最小値",value=20)
+temp2_ymax=st.number_input("Temp_最大値",value=30)
 
 if st.button("解析開始"):
 
@@ -237,11 +324,16 @@ if st.button("解析開始"):
         "xmax":R_xmax,
         "ymin":R_ymin,
         "ymax":R_ymax
+        },
+        
+        "position": {
+        "xlim":(0, 9),
+        "ylim":(0, temp1_ymax)
         }
 
         }
 
-        path1,path2,path3,result_path,R_avg_1000,R_avg_2000,base_name=run_analysis(
+        path1,path2,path3,path4,result_path,R_avg_1000,R_avg_2000,base_name=run_analysis(
         csv_path,tmp_dir,r2,d,graph_limits
         )
 
@@ -274,6 +366,15 @@ if st.button("解析開始"):
             file_name="R_plot.png",
             mime="image/png"
             )
+        
+        st.image(path4)
+        with open(path4,"rb") as f:
+            st.download_button(
+            "温度分布グラフPNGダウンロード",
+            f,
+            file_name="温度分布_plot.png",
+            mime="image/png"
+            ) 
             
         zip_buffer = io.BytesIO()
 
