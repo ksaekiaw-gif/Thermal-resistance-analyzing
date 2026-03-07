@@ -375,6 +375,14 @@ if st.button("解析開始"):
             file_name="温度分布_plot.png",
             mime="image/png"
             ) 
+        
+        with open(result_path, "rb") as f:
+            st.download_button(
+            "解析結果CSVダウンロード",
+            f,
+            file_name="result.csv",
+            mime="text/csv"
+            )
             
         zip_buffer = io.BytesIO()
 
@@ -383,7 +391,8 @@ if st.button("解析開始"):
             z.write(path1, arcname="upper_temperature.png")
             z.write(path2, arcname="lower_temperature.png")
             z.write(path3, arcname="R_plot.png")
-            z.write(result_path, arcname="回帰結果")
+            z.write(path4, arcname="温度分布_plot.png")
+            z.write(result_path, arcname="回帰結果.csv")
         zip_buffer.seek(0)
         
         st.download_button(
