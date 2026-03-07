@@ -244,7 +244,7 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
     plt.ylim(graph_limits["position"]["ylim"])
     plt.tight_layout()
     path4=os.path.join(output_dir,"温度分布.png")
-    plt.savefig(path3,dpi=300)
+    plt.savefig(path4,dpi=300)
     plt.close()
     
     # =============================
@@ -269,26 +269,26 @@ r2=st.number_input("サンプル直径2r [cm] (サンプルが直方体の場合
 d=st.number_input("サンプル厚みd [mm]",value=1.0, step=0.001)
 
 st.subheader("グラフ設定")
-time_min=st.number_input("Time_開始値[s]",value=0)
-time_max=st.number_input("Time_最大値[s]",value=8000)
+time_min=st.number_input("Time_開始値 [s]",value=0)
+time_max=st.number_input("Time_最大値 [s]",value=8000)
 st.subheader("Rグラフ設定")
 
 R_xmin=time_min
 R_xmax=time_max
 
-R_ymin=st.number_input("R_最小値[mm²K/W]",value=0.0)
-R_ymax=st.number_input("R_最大値[mm²K/W]",value=1500)
+R_ymin=st.number_input("R_最小値 [mm²K/W]",value=0.0)
+R_ymax=st.number_input("R_最大値 [mm²K/W]",value=1500)
 
 st.subheader("上側銅ブロックのグラフ設定")
 temp_xmin=time_min
 temp_xmax=time_max
 
-temp1_ymin=st.number_input("Temp_最小値",value=20,key="temp1_ymin")
-temp1_ymax=st.number_input("Temp_最大値",value=110,key="temp1_ymax")
+temp1_ymin=st.number_input("Temp_最小値 [℃]",value=20,key="temp1_ymin")
+temp1_ymax=st.number_input("Temp_最大値 [℃]",value=110,key="temp1_ymax")
 
 st.subheader("下側銅ブロックのグラフ設定")
-temp2_ymin=st.number_input("Temp_最小値",value=20,key="temp2_ymin")
-temp2_ymax=st.number_input("Temp_最大値",value=30,key="temp2_ymax")
+temp2_ymin=st.number_input("Temp_最小値 [℃]",value=20,key="temp2_ymin")
+temp2_ymax=st.number_input("Temp_最大値 [℃]",value=30,key="temp2_ymax")
 
 if st.button("解析開始"):
 
