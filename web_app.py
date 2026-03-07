@@ -128,10 +128,11 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
 
     plt.scatter(df_result["行番号"],df_result["R"],s=10,label="R",color="red")
     plt.scatter(df_result["行番号"],df_result["R_average"],s=10,label="R_average",color="blue")
-
     plt.xlabel("Time [s]")
     plt.ylabel("Thermal Resistance")
     plt.legend()
+    plt.xlim(graph_limits["R"]["xmin"],graph_limits["R"]["xmax"])
+    plt.ylim(graph_limits["R"]["ymin"],graph_limits["R"]["ymax"])
     plt.tight_layout()
 
     path3=os.path.join(output_dir,"R_plot.png")
@@ -161,12 +162,22 @@ d=st.number_input("d [mm]",value=1.0)
 
 st.subheader("グラフ設定")
 
+st.subheader("Rグラフ設定")
+
+R_xmin=st.number_input("Rグラフ xmin",value=0)
+R_xmax=st.number_input("Rグラフ xmax",value=8000)
+
+R_ymin=st.number_input("Rグラフ ymin",value=0.0)
+R_ymax=st.number_input("Rグラフ ymax",value=1500)
+
+st.subheader("上側銅ブロックのグラフ設定")
 temp_xmin=st.number_input("時間 xmin",value=0)
 temp_xmax=st.number_input("時間 xmax",value=8000)
 
 temp1_ymin=st.number_input("上側温度 ymin",value=20)
 temp1_ymax=st.number_input("上側温度 ymax",value=110)
 
+st.subheader("下側銅ブロックのグラフ設定")
 temp2_ymin=st.number_input("下側温度 ymin",value=20)
 temp2_ymax=st.number_input("下側温度 ymax",value=30)
 
@@ -197,6 +208,13 @@ if st.button("解析開始"):
         "xmax":temp_xmax,
         "ymin":temp2_ymin,
         "ymax":temp2_ymax
+        },
+        
+        "R":{
+        "xmin":R_xmin,
+        "xmax":R_xmax,
+        "ymin":R_ymin,
+        "ymax":R_ymax
         }
 
         }
@@ -208,9 +226,31 @@ if st.button("解析開始"):
         st.success("解析完了")
 
         st.image(path1)
+        with open(path1,"rb") as f:
+            st.download_button(
+            "上側温度グラフPNGダウンロード",
+            f,
+            file_name="upper_temperature.png",
+            mime="image/png"
+            )
+            
         st.image(path2)
+        with open(path2,"rb") as f:
+            st.download_button(
+            "下側温度グラフPNGダウンロード",
+            f,
+            file_name="lower_temperature.png",
+            mime="image/png"
+            )
         st.image(path3)
-
+        with open(path3,"rb") as f:
+            st.download_button(
+            "RグラフPNGダウンロード",
+            f,
+            file_name="R_plot.png",
+            mime="image/png"
+            )
+            
         st.download_button(
             "result.csvダウンロード",
             open(result_path,"rb"),
