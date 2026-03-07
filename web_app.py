@@ -78,6 +78,25 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
 
     time=df.iloc[:,0]
 
+    # 測定終了時間
+    end_time = time.iloc[-1]
+
+    # -------------------------
+    # 終了1000s前までの平均
+    # -------------------------
+
+    mask_1000 = time >= (end_time - 1000)
+
+    R_avg_1000 = df_result.loc[mask_1000, "R"].mean()
+
+    # -------------------------
+    # 終了2000s前までの平均
+    # -------------------------
+
+    mask_2000 = time >= (end_time - 2000)
+
+    R_avg_2000 = df_result.loc[mask_2000, "R"].mean()
+    
     # =============================
     # 温度グラフ 上
     # =============================
@@ -146,7 +165,7 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
     result_path=os.path.join(output_dir,"result.csv")
     df_result.to_csv(result_path,index=False,encoding="shift_jis")
 
-    return path1,path2,path3,result_path
+    return path1,path2,path3,result_path,R_avg_1000,R_avg_2000
 
 
 # =============================
@@ -219,12 +238,14 @@ if st.button("解析開始"):
 
         }
 
-        path1,path2,path3,result_path=run_analysis(
-            csv_path,tmp_dir,r2,d,graph_limits
+        path1,path2,path3,result_path,R_avg_1000,R_avg_2000=run_analysis(
+        csv_path,tmp_dir,r2,d,graph_limits
         )
 
         st.success("解析完了")
-
+        st.metric("R_average (last 1000s)", round(R_avg_1000,5))
+        st.metric("R_average (last 2000s)", round(R_avg_2000,5))
+        
         st.image(path1)
         with open(path1,"rb") as f:
             st.download_button(
