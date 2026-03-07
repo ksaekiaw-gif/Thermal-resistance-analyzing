@@ -178,29 +178,30 @@ st.title("熱抵抗解析 Webアプリ")
 
 uploaded_file=st.file_uploader("CSVファイル")
 
-r2=st.number_input("r2 [cm]",value=0.8)
-d=st.number_input("d [mm]",value=1.0)
+r2=st.number_input("サンプル直径2r [cm] (サンプルが直方体の場合、2/√π=1.12837 cm)",value=0.8, step=0.000001)
+d=st.number_input("サンプル厚みd [mm]",value=1.0, step=0.001)
 
 st.subheader("グラフ設定")
-
+time_min=st.number_input("時間軸_開始値[s]",value=0)
+time_max=st.number_input("時間軸_最大値[s]",value=8000)
 st.subheader("Rグラフ設定")
 
-R_xmin=st.number_input("Rグラフ xmin",value=0)
-R_xmax=st.number_input("Rグラフ xmax",value=8000)
+R_xmin=time_min
+R_xmax=time_max
 
-R_ymin=st.number_input("Rグラフ ymin",value=0.0)
-R_ymax=st.number_input("Rグラフ ymax",value=1500)
+R_ymin=st.number_input("熱抵抗_最小値[mm²K/W]",value=0.0)
+R_ymax=st.number_input("熱抵抗_最大値[mm²K/W]",value=1500)
 
 st.subheader("上側銅ブロックのグラフ設定")
-temp_xmin=st.number_input("時間 xmin",value=0)
-temp_xmax=st.number_input("時間 xmax",value=8000)
+temp_xmin=time_min
+temp_xmax=time_max
 
-temp1_ymin=st.number_input("上側温度 ymin",value=20)
-temp1_ymax=st.number_input("上側温度 ymax",value=110)
+temp1_ymin=st.number_input("上側銅ブロック温度_最小値",value=20)
+temp1_ymax=st.number_input("上側銅ブロック温度_最大値",value=110)
 
 st.subheader("下側銅ブロックのグラフ設定")
-temp2_ymin=st.number_input("下側温度 ymin",value=20)
-temp2_ymax=st.number_input("下側温度 ymax",value=30)
+temp2_ymin=st.number_input("下側銅ブロック温度_最小値",value=20)
+temp2_ymax=st.number_input("下側銅ブロック温度_最大値",value=30)
 
 if st.button("解析開始"):
 
