@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import streamlit as st
 import tempfile
+import zipfile
+import io
 
 # =============================
 # 解析関数（元コードそのまま）
@@ -148,12 +150,12 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
     plt.scatter(df_result["行番号"],df_result["R"],s=10,label="R",color="red")
     plt.scatter(df_result["行番号"],df_result["R_average"],s=10,label="R_average",color="blue")
     plt.xlabel("Time [s]")
-    plt.ylabel("Thermal Resistance")
+    plt.ylabel("Thermal Resistance R [mm$^2$ K/W]")
     plt.legend()
     plt.xlim(graph_limits["R"]["xmin"],graph_limits["R"]["xmax"])
     plt.ylim(graph_limits["R"]["ymin"],graph_limits["R"]["ymax"])
     plt.tight_layout()
-
+    
     path3=os.path.join(output_dir,"R_plot.png")
     plt.savefig(path3,dpi=300)
     plt.close()
@@ -165,7 +167,7 @@ def run_analysis(csv_path, output_root, r_2, d, graph_limits):
     result_path=os.path.join(output_dir,"result.csv")
     df_result.to_csv(result_path,index=False,encoding="shift_jis")
 
-    return path1,path2,path3,result_path,R_avg_1000,R_avg_2000
+    return path1,path2,path3,result_path,R_avg_1000,R_avg_2000,base_name
 
 
 # =============================
@@ -238,13 +240,13 @@ if st.button("解析開始"):
 
         }
 
-        path1,path2,path3,result_path,R_avg_1000,R_avg_2000=run_analysis(
+        path1,path2,path3,result_path,R_avg_1000,R_avg_2000,base_name=run_analysis(
         csv_path,tmp_dir,r2,d,graph_limits
         )
 
         st.success("解析完了")
-        st.metric("R_average (last 1000s)", round(R_avg_1000,5))
-        st.metric("R_average (last 2000s)", round(R_avg_2000,5))
+        st.metric("R_average (last 1000s)", f"{round(R_avg_1000,5)} mm²K/W")
+        st.metric("R_average (last 2000s)", f"{round(R_avg_2000,5)} mm²K/W")
         
         st.image(path1)
         with open(path1,"rb") as f:
@@ -272,8 +274,19 @@ if st.button("解析開始"):
             mime="image/png"
             )
             
+        zip_buffer = io.BytesIO()
+
+        with zipfile.ZipFile(zip_buffer, "w") as z:
+
+            z.write(path1, arcname="upper_temperature.png")
+            z.write(path2, arcname="lower_temperature.png")
+            z.write(path3, arcname="R_plot.png")
+            z.write(result_path, arcname="回帰結果")
+        zip_buffer.seek(0)
+        
         st.download_button(
-            "result.csvダウンロード",
-            open(result_path,"rb"),
-            file_name="result.csv"
+            label="グラフPNG一括ダウンロード",
+            data=zip_buffer,
+            file_name=f"{base_name}_graphs.zip",
+            mime="application/zip"
         )
