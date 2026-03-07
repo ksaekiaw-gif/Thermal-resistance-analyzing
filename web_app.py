@@ -283,12 +283,12 @@ st.subheader("上側銅ブロックのグラフ設定")
 temp_xmin=time_min
 temp_xmax=time_max
 
-temp1_ymin=st.number_input("Temp_最小値",value=20)
-temp1_ymax=st.number_input("Temp_最大値",value=110)
+temp1_ymin=st.number_input("Temp_最小値",value=20,key="temp1_ymin")
+temp1_ymax=st.number_input("Temp_最大値",value=110,key="temp1_ymax")
 
 st.subheader("下側銅ブロックのグラフ設定")
-temp2_ymin=st.number_input("Temp_最小値",value=20)
-temp2_ymax=st.number_input("Temp_最大値",value=30)
+temp2_ymin=st.number_input("Temp_最小値",value=20,key="temp2_ymin")
+temp2_ymax=st.number_input("Temp_最大値",value=30,key="temp2_ymax")
 
 if st.button("解析開始"):
 
