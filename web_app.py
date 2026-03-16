@@ -354,6 +354,8 @@ if st.session_state.get("analysis_done",False):
     path4=st.session_state["path4"]
     result_path=st.session_state["result_path"]
     base_name=st.session_state["base_name"]
+    R_avg_1000=st.session_state["R1000"]
+    R_avg_2000=st.session_state["R2000"]
     
     st.success("解析完了")
     st.metric("R_average (last 1000s)", f"{round(R_avg_1000,5)} mm²K/W")
