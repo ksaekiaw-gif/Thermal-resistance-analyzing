@@ -348,7 +348,7 @@ if st.button("解析開始"):
         st.session_state["path4"]=path4
         st.session_state["result_path"]=result_path
         
-        if st.session_state.get("analysisdone",False):
+        if st.session_state.get("analysisdone",True):
             
             path1=st.session_state["path1"]
             path2=st.session_state["path2"]
