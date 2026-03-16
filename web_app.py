@@ -341,63 +341,76 @@ if st.button("解析開始"):
         st.metric("R_average (last 1000s)", f"{round(R_avg_1000,5)} mm²K/W")
         st.metric("R_average (last 2000s)", f"{round(R_avg_2000,5)} mm²K/W")
         
-        st.image(path1)
-        with open(path1,"rb") as f:
+        st.session_state["analysis_done"]=True
+        st.session_state["path1"]=path1
+        st.session_state["path2"]=path2
+        st.session_state["path3"]=path3
+        st.session_state["path4"]=path4
+        st.session_state["result_path"]=result_path
+        
+        if st.session_state.get("analysisdone",False):
+            
+            st.image(path1)
+            with open(path1,"rb") as f:
+                st.download_button(
+                "上側温度グラフPNGダウンロード",
+                f,
+                file_name="upper_temperature.png",
+                mime="image/png"
+                )
+            
+            st.image(path2)
+            with open(path2,"rb") as f:
+                st.download_button(
+                "下側温度グラフPNGダウンロード",
+                f,
+                file_name="lower_temperature.png",
+                mime="image/png"
+                )
+            st.image(path3)
+            with open(path3,"rb") as f:
+                st.download_button(
+                "RグラフPNGダウンロード",
+                f,
+                file_name="R_plot.png",
+                mime="image/png"
+                )
+        
+            st.image(path4)
+            with open(path4,"rb") as f:
+                st.download_button(
+                "温度分布グラフPNGダウンロード",
+                f,
+                file_name="温度分布_plot.png",
+                mime="image/png"
+                ) 
+        
+            with open(result_path, "rb") as f:
+                st.download_button(
+                "解析結果CSVダウンロード",
+                f,
+                file_name="result.csv",
+                mime="text/csv"
+                )
+            
+            zip_buffer = io.BytesIO()
+
+            with zipfile.ZipFile(zip_buffer, "w") as z:
+
+                z.write(path1, arcname="upper_temperature.png")
+                z.write(path2, arcname="lower_temperature.png")
+                z.write(path3, arcname="R_plot.png")
+                z.write(path4, arcname="温度分布_plot.png")
+                z.write(result_path, arcname="回帰結果.csv")
+            zip_buffer.seek(0)
+        
             st.download_button(
-            "上側温度グラフPNGダウンロード",
-            f,
-            file_name="upper_temperature.png",
-            mime="image/png"
+                label="グラフPNG一括ダウンロード",
+                data=zip_buffer,
+                file_name=f"{base_name}_graphs.zip",
+                mime="application/zip"
             )
             
-        st.image(path2)
-        with open(path2,"rb") as f:
-            st.download_button(
-            "下側温度グラフPNGダウンロード",
-            f,
-            file_name="lower_temperature.png",
-            mime="image/png"
-            )
-        st.image(path3)
-        with open(path3,"rb") as f:
-            st.download_button(
-            "RグラフPNGダウンロード",
-            f,
-            file_name="R_plot.png",
-            mime="image/png"
-            )
-        
-        st.image(path4)
-        with open(path4,"rb") as f:
-            st.download_button(
-            "温度分布グラフPNGダウンロード",
-            f,
-            file_name="温度分布_plot.png",
-            mime="image/png"
-            ) 
-        
-        with open(result_path, "rb") as f:
-            st.download_button(
-            "解析結果CSVダウンロード",
-            f,
-            file_name="result.csv",
-            mime="text/csv"
-            )
-            
-        zip_buffer = io.BytesIO()
-
-        with zipfile.ZipFile(zip_buffer, "w") as z:
-
-            z.write(path1, arcname="upper_temperature.png")
-            z.write(path2, arcname="lower_temperature.png")
-            z.write(path3, arcname="R_plot.png")
-            z.write(path4, arcname="温度分布_plot.png")
-            z.write(result_path, arcname="回帰結果.csv")
-        zip_buffer.seek(0)
-        
-        st.download_button(
-            label="グラフPNG一括ダウンロード",
-            data=zip_buffer,
-            file_name=f"{base_name}_graphs.zip",
-            mime="application/zip"
-        )
+if st.button("解析終了"):
+    st.session_state.clear()
+    
