@@ -350,6 +350,12 @@ if st.button("解析開始"):
         
         if st.session_state.get("analysisdone",False):
             
+            path1=st.session_state["path1"]
+            path2=st.session_state["path2"]
+            path3=st.session_state["path3"]
+            path4=st.session_state["path4"]
+            result_path=st.session_state["result_path"]
+            
             st.image(path1)
             with open(path1,"rb") as f:
                 st.download_button(
